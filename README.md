@@ -19,20 +19,34 @@
 
 ---
 
-## 🚀 Quick Start (Running from Source)
+## 🚀 Quick Start (One-Liner Commands)
 
-### 📋 Prerequisites
+You can clone, verify dependencies, and launch **DevPocket** with a single command in your terminal:
+
+### 🐧 Linux & 🍎 macOS (Terminal / zsh / bash)
+```bash
+git clone https://github.com/BashargalalAlhimyari/DevPocket.git && cd DevPocket && python3 DevPocket.py
+```
+
+### 💻 Windows (Command Prompt / PowerShell)
+```cmd
+git clone https://github.com/BashargalalAlhimyari/DevPocket.git && cd DevPocket && python DevPocket.py
+```
+
+---
+
+## 📋 Step-by-Step Installation (From Source)
+
+### Prerequisites
 
 - **Python 3.8+** installed on your system.
 - **Git** installed on your system.
-
----
 
 ### 🐧 Linux & 🍎 macOS
 
 1. **Clone the repository:**
    ```bash
-   git clone <YOUR_GITHUB_REPO_URL>
+   git clone https://github.com/BashargalalAlhimyari/DevPocket.git
    cd DevPocket
    ```
 
@@ -46,13 +60,15 @@
    python3 DevPocket.py
    ```
 
+> 💡 **Linux Note:** On Linux systems (Ubuntu, Debian, Fedora, Arch), Python 3 uses the command `python3`. If you receive `zsh: command not found: python`, make sure to use `python3 DevPocket.py` or install the system alias `sudo apt install python-is-python3`.
+
 ---
 
 ### 💻 Windows (Command Prompt / PowerShell)
 
 1. **Clone the repository:**
    ```cmd
-   git clone <YOUR_GITHUB_REPO_URL>
+   git clone https://github.com/BashargalalAlhimyari/DevPocket.git
    cd DevPocket
    ```
 
@@ -73,7 +89,7 @@
 
 For Windows users who do **not** have Python installed:
 
-1. Download **`DevPocket_Windows_Standalone.zip`** from the [Releases page](https://github.com).
+1. Download **`DevPocket_Windows_Standalone.zip`** from the repository.
 2. Extract the ZIP archive to any folder.
 3. Double-click **`DevPocket.bat`** inside `DevPocket_Windows_Portable/`.
    - On first run, it automatically creates a `DevPocket` shortcut on your Desktop with the official app icon!
@@ -99,7 +115,7 @@ SpeechRecognition>=3.10.0
 
 ```text
 DevPocket/
-├── DevPocket.py           # Application Entry Point
+├── DevPocket.py           # Application Entry Point & Pre-flight Diagnostics
 ├── DevPocket.bat          # Windows Launcher Script (Auto Desktop Shortcut)
 ├── app_icon.png           # Application GUI Icon (PNG)
 ├── app_icon.ico           # Application Desktop Icon (ICO)
