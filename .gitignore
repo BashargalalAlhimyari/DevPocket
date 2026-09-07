@@ -1,0 +1,23 @@
+# Python Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# Build & Executable artifacts
+build/
+dist/
+*.spec
+error_log.txt
+
+# Application Local Config/Data overrides
+notes/*/media/*.wav

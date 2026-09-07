@@ -1,0 +1,10 @@
+tech:53
+dev_scripts:100
+linux_scripts:26
+general:9
+CCNA-LABS:5
+programing:11
+hi:11
+tasks:15
+CC:9
+CCNA:31
