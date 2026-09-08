@@ -45,12 +45,19 @@ def show_todays_reminders_window(filter_cat=None):
     layout = QVBoxLayout(dlg)
     layout.setContentsMargins(15, 15, 15, 15)
 
+    from i18n import get_lang
+    is_ar = (get_lang() == 'ar')
+    if is_ar:
+        dlg.setLayoutDirection(Qt.RightToLeft)
+
     header_str = tr('rem_header')
     lbl = QLabel(header_str)
     lbl.setStyleSheet(f"color: {FG_GREEN}; font-weight: bold; font-size: 14px;")
     layout.addWidget(lbl)
 
     tree = QTreeWidget()
+    if is_ar:
+        tree.setLayoutDirection(Qt.RightToLeft)
     tree.setHeaderLabels(["File", tr('col_rem_title'), tr('col_rem_time'), tr('col_rem_type')])
     tree.hideColumn(0)
     tree.setColumnWidth(1, 280)

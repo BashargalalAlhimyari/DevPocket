@@ -98,6 +98,11 @@ class CategoriesDialog(QDialog):
         self.git_log_signal.connect(self.append_git_log)
         self.git_finished_signal.connect(self.on_git_setup_finished)
 
+        if get_lang() == 'ar':
+            self.setLayoutDirection(Qt.RightToLeft)
+        else:
+            self.setLayoutDirection(Qt.LeftToRight)
+
         self.setWindowTitle("DevNotes - إدارة الفئات والملاحظات")
         self.resize(1240, 740)
         self.setMinimumSize(1100, 660)
@@ -527,6 +532,10 @@ class CategoriesDialog(QDialog):
 
         # Categories List View (Table)
         self.tree = QTreeWidget()
+        if is_ar:
+            self.tree.setLayoutDirection(Qt.RightToLeft)
+        else:
+            self.tree.setLayoutDirection(Qt.LeftToRight)
         self.tree.setHeaderLabels(["File", tr('col_cat_name'), tr('col_visits'), tr('col_notes'), tr('col_scheduled'), tr('col_status'), tr('col_actions')])
         self.tree.hideColumn(0)
 
@@ -803,6 +812,10 @@ class CategoriesDialog(QDialog):
         layout.addWidget(sub)
 
         self.s_tree = QTreeWidget()
+        if is_ar:
+            self.s_tree.setLayoutDirection(Qt.RightToLeft)
+        else:
+            self.s_tree.setLayoutDirection(Qt.LeftToRight)
         headers = ["File", "اسم الفئة 📁" if is_ar else "Category 📁", "نوع الملاحظة 🏷️" if is_ar else "Type 🏷️", "اسم السكربت 🚀" if is_ar else "Script Name 🚀", "الزيارات 👁" if is_ar else "Visits 👁", "المجدولة ⏰" if is_ar else "Schedule ⏰", "الحالة ⚡" if is_ar else "Status ⚡", "الإجراءات 🛠️" if is_ar else "Actions 🛠️"]
         self.s_tree.setHeaderLabels(headers)
         self.s_tree.hideColumn(0)
@@ -928,15 +941,12 @@ class CategoriesDialog(QDialog):
             self.s_tree.setItemWidget(item, 5, tm_lbl)
 
             # Col 6: Status
-            if not is_enabled:
-                st_text = "🔴 معطل" if is_ar else "🔴 Disabled"
-                st_style = "color: #EF4444; font-weight: bold; font-size: 12px;"
-            elif is_synced:
+            if is_synced:
                 st_text = "🟢 متزامنة" if is_ar else "🟢 Synced"
                 st_style = "color: #10B981; font-weight: bold; font-size: 12px;"
             else:
-                st_text = "🟡 غير متزامنة" if is_ar else "🟡 Unsynced"
-                st_style = "color: #F59E0B; font-weight: bold; font-size: 12px;"
+                st_text = "🔴 غير متزامنة" if is_ar else "🔴 Unsynced"
+                st_style = "color: #EF4444; font-weight: bold; font-size: 12px;"
 
             st_badge = QLabel(st_text)
             st_badge.setAlignment(Qt.AlignCenter)
@@ -993,6 +1003,10 @@ class CategoriesDialog(QDialog):
         layout.addWidget(sub)
 
         self.r_tree = QTreeWidget()
+        if is_ar:
+            self.r_tree.setLayoutDirection(Qt.RightToLeft)
+        else:
+            self.r_tree.setLayoutDirection(Qt.LeftToRight)
         headers = ["File", "اسم الفئة 📁" if is_ar else "Category 📁", "نوع الملاحظة 🏷️" if is_ar else "Type 🏷️", "عنوان التذكير 🔔" if is_ar else "Reminder Title 🔔", "الزيارات 👁" if is_ar else "Visits 👁", "الموعد والتكرار ⏰" if is_ar else "Schedule ⏰", "الحالة ⚡" if is_ar else "Status ⚡", "الإجراءات 🛠️" if is_ar else "Actions 🛠️"]
         self.r_tree.setHeaderLabels(headers)
         self.r_tree.hideColumn(0)
@@ -1101,10 +1115,15 @@ class CategoriesDialog(QDialog):
                 self.r_tree.setItemWidget(item, 5, tm_lbl)
 
                 # Col 6: Status
-                st_text = "🟢 نشط" if is_ar else "🟢 Active"
+                if is_synced:
+                    st_text = "🟢 متزامنة" if is_ar else "🟢 Synced"
+                    st_style = "color: #10B981; font-weight: bold; font-size: 12px;"
+                else:
+                    st_text = "🔴 غير متزامنة" if is_ar else "🔴 Unsynced"
+                    st_style = "color: #EF4444; font-weight: bold; font-size: 12px;"
                 st_badge = QLabel(st_text)
                 st_badge.setAlignment(Qt.AlignCenter)
-                st_badge.setStyleSheet("color: #10B981; font-weight: bold; font-size: 12px;")
+                st_badge.setStyleSheet(st_style)
                 
                 st_wrap = QWidget()
                 stw_l = QHBoxLayout(st_wrap)
@@ -2009,7 +2028,7 @@ class CategoriesDialog(QDialog):
         icon_lbl = QLabel("📁")
         icon_lbl.setStyleSheet(f"font-size: 24px; color: {folder_color}; background: transparent;")
         
-        st_txt = ("متزامنة" if is_synced else "غير متزامنة") if is_ar else ("Synced" if is_synced else "Unsynced")
+        st_txt = ("🟢 متزامنة" if is_synced else "🔴 غير متزامنة") if is_ar else ("🟢 Synced" if is_synced else "🔴 Unsynced")
         sync_badge = QLabel(st_txt)
         sync_badge.setToolTip("الفئة متزامنة بالكامل" if is_synced else "تحتوي الفئة على ملفات محليّة غير متزامنة")
         if is_synced:
@@ -2177,11 +2196,11 @@ class CategoriesDialog(QDialog):
             # Col 5: Git Sync Status Badge
             cat_synced = is_category_synced(cat_name, unsynced_set)
             if cat_synced:
-                st_text = "متزامنة" if is_ar else "Synced"
+                st_text = "🟢 متزامنة" if is_ar else "🟢 Synced"
                 st_style = "color: #10B981; font-weight: bold; font-size: 12px;"
                 st_tip = "جميع ملاحظات وملفات هذه الفئة متزامنة ومرفوعة بالكامل على GitHub" if is_ar else "All notes and files in this category are fully synced with GitHub"
             else:
-                st_text = "غير متزامنة" if is_ar else "Unsynced"
+                st_text = "🔴 غير متزامنة" if is_ar else "🔴 Unsynced"
                 st_style = "color: #EF4444; font-weight: bold; font-size: 12px;"
                 st_tip = "توجد تعديلات محليّة أو ملاحظات جديدة لم يتم رفعها لـ GitHub بعد" if is_ar else "Local changes or new notes pending push to GitHub"
 

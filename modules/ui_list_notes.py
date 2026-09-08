@@ -56,6 +56,11 @@ class NotesListDialog(QDialog):
             self.win_title = "📝 جميع الملاحظات والملفات" if is_ar else "📝 All Notes & Files"
             self.sub_title = "عرض وتصفح جميع الملاحظات المحفوظة" if is_ar else "Browse all saved notes"
             
+        if is_ar:
+            self.setLayoutDirection(Qt.RightToLeft)
+        else:
+            self.setLayoutDirection(Qt.LeftToRight)
+
         self.setWindowTitle(self.win_title)
         self.resize(980, 640)
         self.setMinimumSize(880, 560)
@@ -211,6 +216,10 @@ class NotesListDialog(QDialog):
 
         # List View (Tree Table - واحد تحت واحد)
         self.tree = QTreeWidget()
+        if is_ar:
+            self.tree.setLayoutDirection(Qt.RightToLeft)
+        else:
+            self.tree.setLayoutDirection(Qt.LeftToRight)
         headers = ["File", "اسم الفئة 📁", "نوع الملاحظة 🏷️", "عنوان الملاحظة 📝", "الزيارات 👁", "المجدولة ⏰", "الحالة ⚡", "الإجراءات 🛠️"]
         if self.only_scheduled_scripts:
             headers[3] = "اسم السكربت 🚀"
@@ -387,8 +396,8 @@ class NotesListDialog(QDialog):
         tp_badge.setStyleSheet(f"background-color: {type_bg}; color: {type_fg}; border-radius: 4px; padding: 2px 6px; font-weight: bold; font-size: 10px;")
         top_h.addWidget(tp_badge)
 
-        sync_badge = QLabel("متزامنة" if is_synced else "غير متزامنة")
-        sync_badge.setToolTip("مزامنة بالكامل" if is_synced else "غير متزامنة")
+        sync_badge = QLabel("🟢 متزامنة" if is_synced else "🔴 غير متزامنة")
+        sync_badge.setToolTip("مزامنة بالكامل مع GitHub" if is_synced else "غير متزامنة بعد مع GitHub")
         if is_synced:
             sync_badge.setStyleSheet("color: #10B981; font-weight: bold; font-size: 11px;")
         else:
@@ -567,21 +576,19 @@ class NotesListDialog(QDialog):
                 tm_lbl.setStyleSheet("color: #64748B; font-size: 12px;")
             self.tree.setItemWidget(item, 5, tm_lbl)
 
-            # Col 6: الحالة ⚡ (متزامنة / غير متزامنة + التفعيل)
-            is_enabled = str(item_data.get('script_enabled', 'true')).lower() in ['true', 'yes', '1']
-            if is_script and not is_enabled:
-                st_txt = "🔴 معطل"
-                st_clr = "#F87171"
-            elif is_synced:
-                st_txt = "🟢 متزامنة"
+            # Col 6: الحالة ⚡ (متزامنة / غير متزامنة)
+            if is_synced:
+                st_txt = "🟢 متزامنة" if is_ar else "🟢 Synced"
                 st_clr = "#10B981"
+                st_tip = "الملاحظة متزامنة بالكامل مع GitHub" if is_ar else "Note is fully synced with GitHub"
             else:
-                st_txt = "🟡 غير متزامنة"
-                st_clr = "#F59E0B"
+                st_txt = "🔴 غير متزامنة" if is_ar else "🔴 Unsynced"
+                st_clr = "#EF4444"
+                st_tip = "الملاحظة غير متزامنة بعد مع GitHub" if is_ar else "Note is not synced yet with GitHub"
 
             sync_lbl = QLabel(st_txt)
             sync_lbl.setAlignment(Qt.AlignCenter)
-            sync_lbl.setToolTip("حالة المتزامنة مع GitHub وتفعيل الأتمتة")
+            sync_lbl.setToolTip(st_tip)
             sync_lbl.setStyleSheet(f"color: {st_clr}; font-weight: bold; font-size: 12px;")
 
             sync_wrap = QWidget()
