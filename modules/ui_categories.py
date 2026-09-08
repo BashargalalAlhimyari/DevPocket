@@ -529,12 +529,26 @@ class CategoriesDialog(QDialog):
         self.tree = QTreeWidget()
         self.tree.setHeaderLabels(["File", tr('col_cat_name'), tr('col_visits'), tr('col_notes'), tr('col_scheduled'), tr('col_status'), tr('col_actions')])
         self.tree.hideColumn(0)
+
+        from PyQt5.QtWidgets import QHeaderView
+        cat_hdr = self.tree.header()
+        cat_hdr.setStretchLastSection(False)
+        cat_hdr.setDefaultAlignment(Qt.AlignCenter)
+
         self.tree.setColumnWidth(1, 260)
         self.tree.setColumnWidth(2, 90)
-        self.tree.setColumnWidth(3, 90)
-        self.tree.setColumnWidth(4, 90)
+        self.tree.setColumnWidth(3, 100)
+        self.tree.setColumnWidth(4, 100)
         self.tree.setColumnWidth(5, 110)
         self.tree.setColumnWidth(6, 170)
+
+        cat_hdr.setSectionResizeMode(0, QHeaderView.Fixed)
+        cat_hdr.setSectionResizeMode(1, QHeaderView.Stretch)
+        cat_hdr.setSectionResizeMode(2, QHeaderView.Interactive)
+        cat_hdr.setSectionResizeMode(3, QHeaderView.Interactive)
+        cat_hdr.setSectionResizeMode(4, QHeaderView.Interactive)
+        cat_hdr.setSectionResizeMode(5, QHeaderView.Interactive)
+        cat_hdr.setSectionResizeMode(6, QHeaderView.Fixed)
         
         def on_cat_click(item, col):
             if col != 6: # Ignore action buttons column
@@ -789,18 +803,34 @@ class CategoriesDialog(QDialog):
         layout.addWidget(sub)
 
         self.s_tree = QTreeWidget()
-        headers = ["File", "اسم الفئة 📁" if is_ar else "Category 📁", "الزيارات 👁" if is_ar else "Visits 👁", "اسم السكربت 🚀" if is_ar else "Script Name 🚀", "المجدولة ⏰" if is_ar else "Schedule ⏰", "الحالة ⚡" if is_ar else "Status ⚡", "الإجراءات 🛠️" if is_ar else "Actions 🛠️"]
+        headers = ["File", "اسم الفئة 📁" if is_ar else "Category 📁", "نوع الملاحظة 🏷️" if is_ar else "Type 🏷️", "اسم السكربت 🚀" if is_ar else "Script Name 🚀", "الزيارات 👁" if is_ar else "Visits 👁", "المجدولة ⏰" if is_ar else "Schedule ⏰", "الحالة ⚡" if is_ar else "Status ⚡", "الإجراءات 🛠️" if is_ar else "Actions 🛠️"]
         self.s_tree.setHeaderLabels(headers)
         self.s_tree.hideColumn(0)
-        self.s_tree.setColumnWidth(1, 130)
-        self.s_tree.setColumnWidth(2, 90)
+
+        from PyQt5.QtWidgets import QHeaderView
+        s_hdr = self.s_tree.header()
+        s_hdr.setStretchLastSection(False)
+        s_hdr.setDefaultAlignment(Qt.AlignCenter)
+
+        self.s_tree.setColumnWidth(1, 110)
+        self.s_tree.setColumnWidth(2, 100)
         self.s_tree.setColumnWidth(3, 240)
-        self.s_tree.setColumnWidth(4, 160)
-        self.s_tree.setColumnWidth(5, 120)
-        self.s_tree.setColumnWidth(6, 160)
+        self.s_tree.setColumnWidth(4, 80)
+        self.s_tree.setColumnWidth(5, 150)
+        self.s_tree.setColumnWidth(6, 110)
+        self.s_tree.setColumnWidth(7, 160)
+
+        s_hdr.setSectionResizeMode(0, QHeaderView.Fixed)
+        s_hdr.setSectionResizeMode(1, QHeaderView.Interactive)
+        s_hdr.setSectionResizeMode(2, QHeaderView.Interactive)
+        s_hdr.setSectionResizeMode(3, QHeaderView.Stretch)
+        s_hdr.setSectionResizeMode(4, QHeaderView.Interactive)
+        s_hdr.setSectionResizeMode(5, QHeaderView.Interactive)
+        s_hdr.setSectionResizeMode(6, QHeaderView.Interactive)
+        s_hdr.setSectionResizeMode(7, QHeaderView.Fixed)
         
         def on_script_click(item, col):
-            if col != 6:
+            if col != 7:
                 fp = item.data(0, Qt.UserRole)
                 if fp:
                     show_note_view_window(fp, parent=self)
@@ -849,7 +879,7 @@ class CategoriesDialog(QDialog):
             is_enabled = str(s.get('script_enabled', 'true')).lower() in ['true', 'yes', '1']
             is_synced = is_file_synced(filepath, unsynced_set)
 
-            item = QTreeWidgetItem(["", "", "", "", "", "", ""])
+            item = QTreeWidgetItem(["", "", "", "", "", "", "", ""])
             item.setData(0, Qt.UserRole, filepath)
             self.s_tree.addTopLevelItem(item)
 
@@ -858,18 +888,28 @@ class CategoriesDialog(QDialog):
             cat_lbl.setStyleSheet(f"color: {c['FG_MUTED']}; font-weight: bold; font-size: 12px;")
             self.s_tree.setItemWidget(item, 1, cat_lbl)
 
-            # Col 2: Visits
-            v_lbl = QLabel(f"👁 {s.get('access', 0)}")
-            v_lbl.setAlignment(Qt.AlignCenter)
-            v_lbl.setStyleSheet(f"color: {c['FG_MUTED']}; font-size: 12px; font-weight: bold;")
-            self.s_tree.setItemWidget(item, 2, v_lbl)
+            # Col 2: Note Type
+            tp_lbl = QLabel("🚀 سكريبت" if is_ar else "🚀 Script")
+            tp_lbl.setAlignment(Qt.AlignCenter)
+            tp_lbl.setStyleSheet("background-color: #281A45; color: #C084FC; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 5px;")
+            tp_wrap = QWidget()
+            tp_layout = QHBoxLayout(tp_wrap)
+            tp_layout.setContentsMargins(0, 0, 0, 0)
+            tp_layout.addWidget(tp_lbl, 0, Qt.AlignCenter)
+            self.s_tree.setItemWidget(item, 2, tp_wrap)
 
             # Col 3: Title
             t_lbl = QLabel(f"🚀  {s['title']}")
             t_lbl.setStyleSheet(f"color: {c['FG_TEXT']}; font-weight: bold; font-size: 13px;")
             self.s_tree.setItemWidget(item, 3, t_lbl)
 
-            # Col 4: Timing
+            # Col 4: Visits
+            v_lbl = QLabel(f"👁 {s.get('access', 0)}")
+            v_lbl.setAlignment(Qt.AlignCenter)
+            v_lbl.setStyleSheet(f"color: {c['FG_MUTED']}; font-size: 12px; font-weight: bold;")
+            self.s_tree.setItemWidget(item, 4, v_lbl)
+
+            # Col 5: Timing
             s_exec = s.get('scheduled_exec', '').strip()
             is_boot = str(s.get('run_on_boot', 'false')).lower() in ['true', 'yes', '1']
             evt_trig = s.get('event_trigger', '').strip()
@@ -885,9 +925,9 @@ class CategoriesDialog(QDialog):
             timing_txt = " | ".join(t_arr) if t_arr else ("⚪ غير مجدول" if is_ar else "⚪ Unscheduled")
             tm_lbl = QLabel(timing_txt)
             tm_lbl.setStyleSheet("color: #FBBF24; font-size: 12px; font-weight: bold;" if t_arr else f"color: {c['CLR_TEXT_MUTED']}; font-size: 12px;")
-            self.s_tree.setItemWidget(item, 4, tm_lbl)
+            self.s_tree.setItemWidget(item, 5, tm_lbl)
 
-            # Col 5: Status
+            # Col 6: Status
             if not is_enabled:
                 st_text = "🔴 معطل" if is_ar else "🔴 Disabled"
                 st_style = "color: #EF4444; font-weight: bold; font-size: 12px;"
@@ -906,9 +946,9 @@ class CategoriesDialog(QDialog):
             stw_l = QHBoxLayout(st_wrap)
             stw_l.setContentsMargins(0, 0, 0, 0)
             stw_l.addWidget(st_badge, 0, Qt.AlignCenter)
-            self.s_tree.setItemWidget(item, 5, st_wrap)
+            self.s_tree.setItemWidget(item, 6, st_wrap)
 
-            # Col 6: Actions
+            # Col 7: Actions
             act_w = QWidget()
             act_l = QHBoxLayout(act_w)
             act_l.setContentsMargins(0, 0, 0, 0)
@@ -932,7 +972,7 @@ class CategoriesDialog(QDialog):
             b_toggle.clicked.connect(lambda checked, fp=filepath, en=is_enabled: self.toggle_script_direct(fp, en))
             act_l.addWidget(b_toggle)
 
-            self.s_tree.setItemWidget(item, 6, act_w)
+            self.s_tree.setItemWidget(item, 7, act_w)
 
     def build_reminders_view(self):
         from theme import get_theme_colors
@@ -953,18 +993,34 @@ class CategoriesDialog(QDialog):
         layout.addWidget(sub)
 
         self.r_tree = QTreeWidget()
-        headers = ["File", "اسم الفئة 📁" if is_ar else "Category 📁", "الزيارات 👁" if is_ar else "Visits 👁", "عنوان التذكير 🔔" if is_ar else "Reminder Title 🔔", "الموعد والتكرار ⏰" if is_ar else "Schedule ⏰", "الحالة ⚡" if is_ar else "Status ⚡", "الإجراءات 🛠️" if is_ar else "Actions 🛠️"]
+        headers = ["File", "اسم الفئة 📁" if is_ar else "Category 📁", "نوع الملاحظة 🏷️" if is_ar else "Type 🏷️", "عنوان التذكير 🔔" if is_ar else "Reminder Title 🔔", "الزيارات 👁" if is_ar else "Visits 👁", "الموعد والتكرار ⏰" if is_ar else "Schedule ⏰", "الحالة ⚡" if is_ar else "Status ⚡", "الإجراءات 🛠️" if is_ar else "Actions 🛠️"]
         self.r_tree.setHeaderLabels(headers)
         self.r_tree.hideColumn(0)
-        self.r_tree.setColumnWidth(1, 130)
-        self.r_tree.setColumnWidth(2, 90)
+
+        from PyQt5.QtWidgets import QHeaderView
+        r_hdr = self.r_tree.header()
+        r_hdr.setStretchLastSection(False)
+        r_hdr.setDefaultAlignment(Qt.AlignCenter)
+
+        self.r_tree.setColumnWidth(1, 110)
+        self.r_tree.setColumnWidth(2, 100)
         self.r_tree.setColumnWidth(3, 240)
-        self.r_tree.setColumnWidth(4, 160)
-        self.r_tree.setColumnWidth(5, 120)
-        self.r_tree.setColumnWidth(6, 140)
+        self.r_tree.setColumnWidth(4, 80)
+        self.r_tree.setColumnWidth(5, 160)
+        self.r_tree.setColumnWidth(6, 110)
+        self.r_tree.setColumnWidth(7, 140)
+
+        r_hdr.setSectionResizeMode(0, QHeaderView.Fixed)
+        r_hdr.setSectionResizeMode(1, QHeaderView.Interactive)
+        r_hdr.setSectionResizeMode(2, QHeaderView.Interactive)
+        r_hdr.setSectionResizeMode(3, QHeaderView.Stretch)
+        r_hdr.setSectionResizeMode(4, QHeaderView.Interactive)
+        r_hdr.setSectionResizeMode(5, QHeaderView.Interactive)
+        r_hdr.setSectionResizeMode(6, QHeaderView.Interactive)
+        r_hdr.setSectionResizeMode(7, QHeaderView.Fixed)
 
         def on_rem_click(item, col):
-            if col != 6:
+            if col != 7:
                 fp = item.data(0, Qt.UserRole)
                 if fp:
                     show_note_view_window(fp, parent=self)
@@ -992,7 +1048,7 @@ class CategoriesDialog(QDialog):
                 pri = n.get('reminder_priority', 'normal')
                 rep = n.get('reminder_repeat', 'none')
 
-                item = QTreeWidgetItem(["", "", "", "", "", "", ""])
+                item = QTreeWidgetItem(["", "", "", "", "", "", "", ""])
                 item.setData(0, Qt.UserRole, filepath)
                 self.r_tree.addTopLevelItem(item)
 
@@ -1001,23 +1057,50 @@ class CategoriesDialog(QDialog):
                 cat_lbl.setStyleSheet(f"color: {c['FG_MUTED']}; font-weight: bold; font-size: 12px;")
                 self.r_tree.setItemWidget(item, 1, cat_lbl)
 
-                # Col 2: Visits
-                v_lbl = QLabel(f"👁 {n.get('access', 0)}")
-                v_lbl.setAlignment(Qt.AlignCenter)
-                v_lbl.setStyleSheet(f"color: {c['FG_MUTED']}; font-size: 12px; font-weight: bold;")
-                self.r_tree.setItemWidget(item, 2, v_lbl)
+                # Col 2: Note Type
+                raw_type = n.get('type', 'Note')
+                is_script = raw_type == 'Script' or bool(n.get('scheduled_exec') or str(n.get('run_on_boot', 'false')).lower() in ['true', 'yes', '1'])
+                is_task = raw_type == 'Task'
+
+                if is_script:
+                    type_str = "🚀 سكريبت" if is_ar else "🚀 Script"
+                    type_clr = "#C084FC"
+                    type_bg = "#281A45"
+                elif is_task:
+                    type_str = "📋 مهمة" if is_ar else "📋 Task"
+                    type_clr = "#FBBF24"
+                    type_bg = "#453517"
+                else:
+                    type_str = "📝 ملاحظة" if is_ar else "📝 Note"
+                    type_clr = "#38BDF8"
+                    type_bg = "#0F2942"
+
+                tp_lbl = QLabel(type_str)
+                tp_lbl.setAlignment(Qt.AlignCenter)
+                tp_lbl.setStyleSheet(f"background-color: {type_bg}; color: {type_clr}; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 5px;")
+                tp_wrap = QWidget()
+                tp_layout = QHBoxLayout(tp_wrap)
+                tp_layout.setContentsMargins(0, 0, 0, 0)
+                tp_layout.addWidget(tp_lbl, 0, Qt.AlignCenter)
+                self.r_tree.setItemWidget(item, 2, tp_wrap)
 
                 # Col 3: Title
                 t_lbl = QLabel(f"🔔  {n['title']}")
                 t_lbl.setStyleSheet(f"color: {c['FG_TEXT']}; font-weight: bold; font-size: 13px;")
                 self.r_tree.setItemWidget(item, 3, t_lbl)
 
-                # Col 4: Timing & Repeat
+                # Col 4: Visits
+                v_lbl = QLabel(f"👁 {n.get('access', 0)}")
+                v_lbl.setAlignment(Qt.AlignCenter)
+                v_lbl.setStyleSheet(f"color: {c['FG_MUTED']}; font-size: 12px; font-weight: bold;")
+                self.r_tree.setItemWidget(item, 4, v_lbl)
+
+                # Col 5: Timing & Repeat
                 tm_lbl = QLabel(f"⏰ {rem} ({rep})")
                 tm_lbl.setStyleSheet("color: #FBBF24; font-size: 12px; font-weight: bold;")
-                self.r_tree.setItemWidget(item, 4, tm_lbl)
+                self.r_tree.setItemWidget(item, 5, tm_lbl)
 
-                # Col 5: Status
+                # Col 6: Status
                 st_text = "🟢 نشط" if is_ar else "🟢 Active"
                 st_badge = QLabel(st_text)
                 st_badge.setAlignment(Qt.AlignCenter)
@@ -1027,9 +1110,9 @@ class CategoriesDialog(QDialog):
                 stw_l = QHBoxLayout(st_wrap)
                 stw_l.setContentsMargins(0, 0, 0, 0)
                 stw_l.addWidget(st_badge, 0, Qt.AlignCenter)
-                self.r_tree.setItemWidget(item, 5, st_wrap)
+                self.r_tree.setItemWidget(item, 6, st_wrap)
 
-                # Col 6: Actions
+                # Col 7: Actions
                 act_w = QWidget()
                 act_l = QHBoxLayout(act_w)
                 act_l.setContentsMargins(0, 0, 0, 0)
@@ -1040,7 +1123,7 @@ class CategoriesDialog(QDialog):
                 b_open.clicked.connect(lambda checked, fp=filepath: show_note_view_window(fp, parent=self))
                 act_l.addWidget(b_open)
 
-                self.r_tree.setItemWidget(item, 6, act_w)
+                self.r_tree.setItemWidget(item, 7, act_w)
 
     def build_git_view(self):
         from theme import get_theme_colors

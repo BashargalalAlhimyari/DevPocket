@@ -211,20 +211,36 @@ class NotesListDialog(QDialog):
 
         # List View (Tree Table - واحد تحت واحد)
         self.tree = QTreeWidget()
-        headers = ["File", "اسم الفئة 📁", "الزيارات 👁", "الملاحظات 📝", "المجدولة ⏰", "الحالة ⚡", "الإجراءات 🛠️"]
+        headers = ["File", "اسم الفئة 📁", "نوع الملاحظة 🏷️", "عنوان الملاحظة 📝", "الزيارات 👁", "المجدولة ⏰", "الحالة ⚡", "الإجراءات 🛠️"]
         if self.only_scheduled_scripts:
             headers[3] = "اسم السكربت 🚀"
         self.tree.setHeaderLabels(headers)
         self.tree.hideColumn(0)
-        self.tree.setColumnWidth(1, 130)  # اسم الفئة
-        self.tree.setColumnWidth(2, 90)   # الزيارات
-        self.tree.setColumnWidth(3, 250)  # الملاحظات
-        self.tree.setColumnWidth(4, 160)  # المجدولة
-        self.tree.setColumnWidth(5, 120)  # الحالة
-        self.tree.setColumnWidth(6, 140)  # الإجراءات
+
+        from PyQt5.QtWidgets import QHeaderView
+        header = self.tree.header()
+        header.setStretchLastSection(False)
+        header.setDefaultAlignment(Qt.AlignCenter)
+
+        self.tree.setColumnWidth(1, 110)  # اسم الفئة
+        self.tree.setColumnWidth(2, 110)  # نوع الملاحظة (ملاحظة / سكريبت / مهمة)
+        self.tree.setColumnWidth(3, 240)  # عنوان الملاحظة / السكربت
+        self.tree.setColumnWidth(4, 80)   # الزيارات
+        self.tree.setColumnWidth(5, 140)  # المجدولة
+        self.tree.setColumnWidth(6, 110)  # الحالة
+        self.tree.setColumnWidth(7, 130)  # الإجراءات
+
+        header.setSectionResizeMode(0, QHeaderView.Fixed)
+        header.setSectionResizeMode(1, QHeaderView.Interactive)
+        header.setSectionResizeMode(2, QHeaderView.Interactive)
+        header.setSectionResizeMode(3, QHeaderView.Stretch)
+        header.setSectionResizeMode(4, QHeaderView.Interactive)
+        header.setSectionResizeMode(5, QHeaderView.Interactive)
+        header.setSectionResizeMode(6, QHeaderView.Interactive)
+        header.setSectionResizeMode(7, QHeaderView.Fixed)
 
         def on_note_click(item, col):
-            if col != 6:
+            if col != 7:
                 self.on_open(item)
 
         self.tree.itemClicked.connect(on_note_click)
@@ -475,7 +491,7 @@ class NotesListDialog(QDialog):
             title_str = item_data['title']
             is_synced = is_file_synced(filepath, unsynced_set)
             
-            item = QTreeWidgetItem(["", "", "", "", "", "", ""])
+            item = QTreeWidgetItem(["", "", "", "", "", "", "", ""])
             item.setText(0, filepath)
             self.tree.addTopLevelItem(item)
 
@@ -484,15 +500,35 @@ class NotesListDialog(QDialog):
             cat_lbl.setStyleSheet("color: #94A3B8; font-weight: bold; font-size: 12px;")
             self.tree.setItemWidget(item, 1, cat_lbl)
 
-            # Col 2: الزيارات 👁
-            v_lbl = QLabel(f"👁 {item_data.get('access', 0)}")
-            v_lbl.setAlignment(Qt.AlignCenter)
-            v_lbl.setStyleSheet("color: #94A3B8; font-size: 12px; font-weight: bold;")
-            self.tree.setItemWidget(item, 2, v_lbl)
+            # Col 2: نوع الملاحظة 🏷️ (ملاحظة / سكريبت / مهمة)
+            raw_type = item_data.get('type', 'Note')
+            is_script = raw_type == 'Script' or bool(item_data.get('scheduled_exec') or str(item_data.get('run_on_boot', 'false')).lower() in ['true', 'yes', '1'])
+            is_task = raw_type == 'Task'
 
-            # Col 3: الملاحظات 📝 / اسم السكربت 🚀
-            is_script = item_data.get('type') == 'Script' or bool(item_data.get('scheduled_exec') or str(item_data.get('run_on_boot', 'false')).lower() in ['true', 'yes', '1'])
-            is_task = item_data.get('type') == 'Task'
+            if is_script:
+                type_str = "🚀 سكريبت"
+                type_clr = "#C084FC"
+                type_bg = "#281A45"
+            elif is_task:
+                type_str = "📋 مهمة"
+                type_clr = "#FBBF24"
+                type_bg = "#453517"
+            else:
+                type_str = "📝 ملاحظة"
+                type_clr = "#38BDF8"
+                type_bg = "#0F2942"
+
+            tp_lbl = QLabel(type_str)
+            tp_lbl.setAlignment(Qt.AlignCenter)
+            tp_lbl.setStyleSheet(f"background-color: {type_bg}; color: {type_clr}; border-radius: 6px; padding: 3px 8px; font-weight: bold; font-size: 11px;")
+            
+            tp_wrap = QWidget()
+            tp_layout = QHBoxLayout(tp_wrap)
+            tp_layout.setContentsMargins(0, 0, 0, 0)
+            tp_layout.addWidget(tp_lbl, 0, Qt.AlignCenter)
+            self.tree.setItemWidget(item, 2, tp_wrap)
+
+            # Col 3: عنوان الملاحظة 📝 / اسم السكربت 🚀
             if is_script:
                 icon_prefix = "🚀"
             elif is_task:
@@ -504,7 +540,13 @@ class NotesListDialog(QDialog):
             t_lbl.setStyleSheet("color: #FFFFFF; font-weight: bold; font-size: 13px;")
             self.tree.setItemWidget(item, 3, t_lbl)
 
-            # Col 4: المجدولة ⏰
+            # Col 4: الزيارات 👁
+            v_lbl = QLabel(f"👁 {item_data.get('access', 0)}")
+            v_lbl.setAlignment(Qt.AlignCenter)
+            v_lbl.setStyleSheet("color: #94A3B8; font-size: 12px; font-weight: bold;")
+            self.tree.setItemWidget(item, 4, v_lbl)
+
+            # Col 5: المجدولة ⏰
             r = item_data.get('reminder')
             s = item_data.get('scheduled_exec')
             b = str(item_data.get('run_on_boot', 'false')).lower() in ['true', 'yes', '1']
@@ -523,9 +565,9 @@ class NotesListDialog(QDialog):
                 tm_lbl.setStyleSheet("color: #FBBF24; font-size: 12px; font-weight: bold;")
             else:
                 tm_lbl.setStyleSheet("color: #64748B; font-size: 12px;")
-            self.tree.setItemWidget(item, 4, tm_lbl)
+            self.tree.setItemWidget(item, 5, tm_lbl)
 
-            # Col 5: الحالة ⚡ (متزامنة / غير متزامنة + التفعيل)
+            # Col 6: الحالة ⚡ (متزامنة / غير متزامنة + التفعيل)
             is_enabled = str(item_data.get('script_enabled', 'true')).lower() in ['true', 'yes', '1']
             if is_script and not is_enabled:
                 st_txt = "🔴 معطل"
@@ -546,9 +588,9 @@ class NotesListDialog(QDialog):
             sync_layout = QHBoxLayout(sync_wrap)
             sync_layout.setContentsMargins(0, 0, 0, 0)
             sync_layout.addWidget(sync_lbl, 0, Qt.AlignCenter)
-            self.tree.setItemWidget(item, 5, sync_wrap)
+            self.tree.setItemWidget(item, 6, sync_wrap)
 
-            # Col 6: الإجراءات 🛠️
+            # Col 7: الإجراءات 🛠️
             action_widget = QWidget()
             action_layout = QHBoxLayout(action_widget)
             action_layout.setContentsMargins(0, 0, 0, 0)
@@ -585,7 +627,7 @@ class NotesListDialog(QDialog):
             action_layout.addWidget(btn_edit)
             action_layout.addWidget(btn_del)
 
-            self.tree.setItemWidget(item, 6, action_widget)
+            self.tree.setItemWidget(item, 7, action_widget)
 
     def get_selection(self, quiet=False):
         items = self.tree.selectedItems()
