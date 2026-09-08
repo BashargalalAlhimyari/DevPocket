@@ -513,6 +513,12 @@ class ScheduleExecDialog(QDialog):
         self.filepath = filepath
         self.refresh_callback = refresh_callback
         
+        self.setWindowFlags(
+            Qt.Window |
+            Qt.WindowMinimizeButtonHint |
+            Qt.WindowMaximizeButtonHint |
+            Qt.WindowCloseButtonHint
+        )
         self.setWindowTitle(tr('sched_dlg_title'))
         self.setMinimumSize(640, 500)
         self.setStyleSheet(get_common_qss())
@@ -803,6 +809,12 @@ class ReminderDialog(QDialog):
         self.filepath = filepath
         self.refresh_callback = refresh_callback
         
+        self.setWindowFlags(
+            Qt.Window |
+            Qt.WindowMinimizeButtonHint |
+            Qt.WindowMaximizeButtonHint |
+            Qt.WindowCloseButtonHint
+        )
         self.setWindowTitle("⏰ تخصيص وتحديد إعدادات التذكير")
         self.setMinimumSize(540, 520)
         self.setStyleSheet(get_common_qss())
@@ -1037,6 +1049,12 @@ class NoteViewDialog(QDialog):
         increase_note_access(filepath)
         self.n_data = parse_note_file(filepath)
         
+        self.setWindowFlags(
+            Qt.Window |
+            Qt.WindowMinimizeButtonHint |
+            Qt.WindowMaximizeButtonHint |
+            Qt.WindowCloseButtonHint
+        )
         self.setWindowTitle(f"تفاصيل الملاحظة: {self.n_data['title']}")
         self.resize(1180, 740)
         self.setMinimumSize(1020, 640)

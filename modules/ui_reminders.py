@@ -37,9 +37,15 @@ def show_todays_reminders_window(filter_cat=None):
             })
 
     dlg = QDialog()
-    title_str = tr('rem_win_title')
+    dlg.setWindowFlags(
+        Qt.Window |
+        Qt.WindowMinimizeButtonHint |
+        Qt.WindowMaximizeButtonHint |
+        Qt.WindowCloseButtonHint
+    )
     dlg.setWindowTitle(title_str)
-    dlg.setFixedSize(740, 440)
+    dlg.setMinimumSize(640, 400)
+    dlg.resize(740, 440)
     dlg.setStyleSheet(get_common_qss())
 
     layout = QVBoxLayout(dlg)
@@ -102,6 +108,12 @@ def show_reminder_alert_popup(filepath):
     priority = n_data.get('reminder_priority', 'normal').lower()
     
     dlg = QDialog()
+    dlg.setWindowFlags(
+        Qt.Window |
+        Qt.WindowMinimizeButtonHint |
+        Qt.WindowMaximizeButtonHint |
+        Qt.WindowCloseButtonHint
+    )
     dlg.setWindowTitle(f"🔔 تنبيه تذكير: {title}")
     dlg.setMinimumSize(580, 400)
     dlg.setStyleSheet(get_common_qss())

@@ -22,6 +22,12 @@ class CreateNoteDialog(QDialog):
         self.saved_data = None
         self.attached_path = ""
         
+        self.setWindowFlags(
+            Qt.Window |
+            Qt.WindowMinimizeButtonHint |
+            Qt.WindowMaximizeButtonHint |
+            Qt.WindowCloseButtonHint
+        )
         self.setWindowTitle(tr('create_dlg_title'))
         self.resize(720, 620)
         self.setMinimumSize(640, 520)

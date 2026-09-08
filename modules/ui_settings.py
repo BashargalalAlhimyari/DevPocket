@@ -22,6 +22,12 @@ class SettingsDialog(QDialog):
         self.settings_changed = False
         
         c = get_theme_colors()
+        self.setWindowFlags(
+            Qt.Window |
+            Qt.WindowMinimizeButtonHint |
+            Qt.WindowMaximizeButtonHint |
+            Qt.WindowCloseButtonHint
+        )
         self.setWindowTitle("⚙️ " + ("إعدادات التطبيق" if get_lang() == 'ar' else "Application Settings"))
         self.resize(620, 500)
         self.setMinimumSize(540, 420)

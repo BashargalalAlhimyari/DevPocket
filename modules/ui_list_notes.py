@@ -61,6 +61,13 @@ class NotesListDialog(QDialog):
         else:
             self.setLayoutDirection(Qt.LeftToRight)
 
+        self.setWindowFlags(
+            Qt.Window |
+            Qt.WindowMinimizeButtonHint |
+            Qt.WindowMaximizeButtonHint |
+            Qt.WindowCloseButtonHint
+        )
+
         self.setWindowTitle(self.win_title)
         self.resize(980, 640)
         self.setMinimumSize(880, 560)
@@ -464,6 +471,7 @@ class NotesListDialog(QDialog):
         return card
 
     def populate_tree(self, *args):
+        is_ar = (get_lang() == 'ar')
         self.tree.clear()
         
         while self.grid_layout.count():

@@ -103,6 +103,13 @@ class CategoriesDialog(QDialog):
         else:
             self.setLayoutDirection(Qt.LeftToRight)
 
+        self.setWindowFlags(
+            Qt.Window |
+            Qt.WindowMinimizeButtonHint |
+            Qt.WindowMaximizeButtonHint |
+            Qt.WindowCloseButtonHint
+        )
+
         self.setWindowTitle("DevNotes - إدارة الفئات والملاحظات")
         self.resize(1240, 740)
         self.setMinimumSize(1100, 660)
