@@ -956,6 +956,19 @@ class CategoriesDialog(QDialog):
             stw_l = QHBoxLayout(st_wrap)
             stw_l.setContentsMargins(0, 0, 0, 0)
             stw_l.addWidget(st_badge, 0, Qt.AlignCenter)
+
+            cat_lbl.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+            tp_wrap.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+            t_lbl.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+            v_lbl.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+            tm_lbl.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+            st_wrap.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+
+            self.s_tree.setItemWidget(item, 1, cat_lbl)
+            self.s_tree.setItemWidget(item, 2, tp_wrap)
+            self.s_tree.setItemWidget(item, 3, t_lbl)
+            self.s_tree.setItemWidget(item, 4, v_lbl)
+            self.s_tree.setItemWidget(item, 5, tm_lbl)
             self.s_tree.setItemWidget(item, 6, st_wrap)
 
             # Col 7: Actions
@@ -1129,6 +1142,19 @@ class CategoriesDialog(QDialog):
                 stw_l = QHBoxLayout(st_wrap)
                 stw_l.setContentsMargins(0, 0, 0, 0)
                 stw_l.addWidget(st_badge, 0, Qt.AlignCenter)
+
+                cat_lbl.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+                tp_wrap.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+                t_lbl.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+                v_lbl.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+                tm_lbl.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+                st_wrap.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+
+                self.r_tree.setItemWidget(item, 1, cat_lbl)
+                self.r_tree.setItemWidget(item, 2, tp_wrap)
+                self.r_tree.setItemWidget(item, 3, t_lbl)
+                self.r_tree.setItemWidget(item, 4, v_lbl)
+                self.r_tree.setItemWidget(item, 5, tm_lbl)
                 self.r_tree.setItemWidget(item, 6, st_wrap)
 
                 # Col 7: Actions
@@ -2007,6 +2033,8 @@ class CategoriesDialog(QDialog):
         is_ar = (get_lang() == 'ar')
 
         card = QFrame()
+        card.setCursor(Qt.PointingHandCursor)
+        card.mousePressEvent = lambda event, c=cat_name: self.open_notes_list_for_cat(c)
         card.setStyleSheet(f"""
             QFrame {{
                 background-color: {c['CLR_CARD_BG']};
@@ -2162,57 +2190,16 @@ class CategoriesDialog(QDialog):
             col0_layout.addLayout(text_box)
             col0_layout.addStretch()
 
+            col0_widget.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+            v_lbl.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+            n_lbl.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+            sched_wrap.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+            st_wrap.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+
             self.tree.setItemWidget(item, 1, col0_widget)
-
-            # Col 2: Visits
-            v_lbl = QLabel(f"👁 {data['access']}")
-            v_lbl.setAlignment(Qt.AlignCenter)
-            v_lbl.setStyleSheet(f"color: {c['FG_MUTED']}; font-size: 13px; font-weight: bold;")
             self.tree.setItemWidget(item, 2, v_lbl)
-
-            # Col 3: Notes count
-            n_lbl = QLabel(str(data['count']))
-            n_lbl.setAlignment(Qt.AlignCenter)
-            n_lbl.setStyleSheet(f"color: {c['FG_TEXT']}; font-size: 13px; font-weight: bold;")
             self.tree.setItemWidget(item, 3, n_lbl)
-
-            # Col 4: Scheduled Badge
-            has_sched = data['scheduled'] > 0
-            sched_str = ("✓ نعم" if has_sched else "✕ لا") if is_ar else ("✓ Yes" if has_sched else "✕ No")
-            sched_badge = QLabel(sched_str)
-            sched_badge.setAlignment(Qt.AlignCenter)
-            sched_badge.setFixedSize(65, 26)
-            if has_sched:
-                sched_badge.setStyleSheet("background-color: #064E3B; color: #34D399; border: 1px solid #059669; border-radius: 6px; font-weight: bold; font-size: 11px;")
-            else:
-                sched_badge.setStyleSheet("background-color: #381A1A; color: #F87171; border: 1px solid #DC2626; border-radius: 6px; font-weight: bold; font-size: 11px;")
-            
-            sched_wrap = QWidget()
-            sw_layout = QHBoxLayout(sched_wrap)
-            sw_layout.setContentsMargins(0, 0, 0, 0)
-            sw_layout.addWidget(sched_badge, 0, Qt.AlignCenter)
             self.tree.setItemWidget(item, 4, sched_wrap)
-
-            # Col 5: Git Sync Status Badge
-            cat_synced = is_category_synced(cat_name, unsynced_set)
-            if cat_synced:
-                st_text = "🟢 متزامنة" if is_ar else "🟢 Synced"
-                st_style = "color: #10B981; font-weight: bold; font-size: 12px;"
-                st_tip = "جميع ملاحظات وملفات هذه الفئة متزامنة ومرفوعة بالكامل على GitHub" if is_ar else "All notes and files in this category are fully synced with GitHub"
-            else:
-                st_text = "🔴 غير متزامنة" if is_ar else "🔴 Unsynced"
-                st_style = "color: #EF4444; font-weight: bold; font-size: 12px;"
-                st_tip = "توجد تعديلات محليّة أو ملاحظات جديدة لم يتم رفعها لـ GitHub بعد" if is_ar else "Local changes or new notes pending push to GitHub"
-
-            st_badge = QLabel(st_text)
-            st_badge.setAlignment(Qt.AlignCenter)
-            st_badge.setStyleSheet(st_style)
-            st_badge.setToolTip(st_tip)
-
-            st_wrap = QWidget()
-            stw_layout = QHBoxLayout(st_wrap)
-            stw_layout.setContentsMargins(0, 0, 0, 0)
-            stw_layout.addWidget(st_badge, 0, Qt.AlignCenter)
             self.tree.setItemWidget(item, 5, st_wrap)
 
             # Col 6: Actions Bar (4 Icon Buttons)

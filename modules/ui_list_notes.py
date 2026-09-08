@@ -372,6 +372,8 @@ class NotesListDialog(QDialog):
             type_bg, type_fg = "#0F2942", "#38BDF8"
 
         card = QFrame()
+        card.setCursor(Qt.PointingHandCursor)
+        card.mousePressEvent = lambda event, fp=filepath: self.on_open_direct(fp)
         card.setStyleSheet(f"""
             QFrame {{
                 background-color: {CLR_CARD_BG};
@@ -595,6 +597,19 @@ class NotesListDialog(QDialog):
             sync_layout = QHBoxLayout(sync_wrap)
             sync_layout.setContentsMargins(0, 0, 0, 0)
             sync_layout.addWidget(sync_lbl, 0, Qt.AlignCenter)
+
+            cat_lbl.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+            tp_wrap.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+            t_lbl.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+            v_lbl.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+            tm_lbl.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+            sync_wrap.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+
+            self.tree.setItemWidget(item, 1, cat_lbl)
+            self.tree.setItemWidget(item, 2, tp_wrap)
+            self.tree.setItemWidget(item, 3, t_lbl)
+            self.tree.setItemWidget(item, 4, v_lbl)
+            self.tree.setItemWidget(item, 5, tm_lbl)
             self.tree.setItemWidget(item, 6, sync_wrap)
 
             # Col 7: الإجراءات 🛠️
