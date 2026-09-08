@@ -2190,6 +2190,53 @@ class CategoriesDialog(QDialog):
             col0_layout.addLayout(text_box)
             col0_layout.addStretch()
 
+            # Col 2: Visits
+            v_lbl = QLabel(f"👁 {data['access']}")
+            v_lbl.setAlignment(Qt.AlignCenter)
+            v_lbl.setStyleSheet(f"color: {c['FG_MUTED']}; font-size: 13px; font-weight: bold;")
+
+            # Col 3: Notes count
+            n_lbl = QLabel(str(data['count']))
+            n_lbl.setAlignment(Qt.AlignCenter)
+            n_lbl.setStyleSheet(f"color: {c['FG_TEXT']}; font-size: 13px; font-weight: bold;")
+
+            # Col 4: Scheduled Badge
+            has_sched = data['scheduled'] > 0
+            sched_str = ("✓ نعم" if has_sched else "✕ لا") if is_ar else ("✓ Yes" if has_sched else "✕ No")
+            sched_badge = QLabel(sched_str)
+            sched_badge.setAlignment(Qt.AlignCenter)
+            sched_badge.setFixedSize(65, 26)
+            if has_sched:
+                sched_badge.setStyleSheet("background-color: #064E3B; color: #34D399; border: 1px solid #059669; border-radius: 6px; font-weight: bold; font-size: 11px;")
+            else:
+                sched_badge.setStyleSheet("background-color: #381A1A; color: #F87171; border: 1px solid #DC2626; border-radius: 6px; font-weight: bold; font-size: 11px;")
+            
+            sched_wrap = QWidget()
+            sw_layout = QHBoxLayout(sched_wrap)
+            sw_layout.setContentsMargins(0, 0, 0, 0)
+            sw_layout.addWidget(sched_badge, 0, Qt.AlignCenter)
+
+            # Col 5: Git Sync Status Badge
+            cat_synced = is_category_synced(cat_name, unsynced_set)
+            if cat_synced:
+                st_text = "🟢 متزامنة" if is_ar else "🟢 Synced"
+                st_style = "color: #10B981; font-weight: bold; font-size: 12px;"
+                st_tip = "جميع ملاحظات وملفات هذه الفئة متزامنة ومرفوعة بالكامل على GitHub" if is_ar else "All notes and files in this category are fully synced with GitHub"
+            else:
+                st_text = "🔴 غير متزامنة" if is_ar else "🔴 Unsynced"
+                st_style = "color: #EF4444; font-weight: bold; font-size: 12px;"
+                st_tip = "توجد تعديلات محليّة أو ملاحظات جديدة لم يتم رفعها لـ GitHub بعد" if is_ar else "Local changes or new notes pending push to GitHub"
+
+            st_badge = QLabel(st_text)
+            st_badge.setAlignment(Qt.AlignCenter)
+            st_badge.setStyleSheet(st_style)
+            st_badge.setToolTip(st_tip)
+
+            st_wrap = QWidget()
+            stw_layout = QHBoxLayout(st_wrap)
+            stw_layout.setContentsMargins(0, 0, 0, 0)
+            stw_layout.addWidget(st_badge, 0, Qt.AlignCenter)
+
             col0_widget.setAttribute(Qt.WA_TransparentForMouseEvents, True)
             v_lbl.setAttribute(Qt.WA_TransparentForMouseEvents, True)
             n_lbl.setAttribute(Qt.WA_TransparentForMouseEvents, True)
